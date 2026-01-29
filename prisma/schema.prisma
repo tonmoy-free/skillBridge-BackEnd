@@ -1,0 +1,174 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+enum Role {
+  STUDENT
+  TUTOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  BANNED
+}
+
+enum BookingStatus {
+  BOOKED
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id       String     @id @default(uuid())
+  name     String
+  email    String     @unique
+  password String
+  role     Role       @default(STUDENT)
+  status   UserStatus @default(ACTIVE)
+  dateOfBirth DateTime?
+
+  tutorProfile      TutorProfile?
+  bookingsAsStudent Booking[] @relation("StudentBookings")
+  reviewsGiven      Review[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+
+model TutorProfile {
+  id          String @id @default(uuid())
+  userId      String @unique
+
+  bio         String
+  hourlyFee   Float        // Tuition fee per hour
+  monthlyFee  Float?       // Optional monthly fee
+  experience  Int          // years
+  rating      Float @default(0)
+
+  user        User @relation(fields: [userId], references: [id])
+  categories  TutorCategory[]
+  availability Availability[]
+  bookings    Booking[]
+  reviews     Review[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Class {
+  id   String @id @default(uuid())
+  name String @unique   // Class 7, Class 8, SSC, HSC
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  categories Category[]
+}
+
+
+model Subject {
+  id   String @id @default(uuid())
+  name String @unique   // Bangla, Math, Physics
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  categories Category[]
+}
+
+model Category {
+  id        String @id @default(uuid())
+  classId   String
+  subjectId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  class     Class   @relation(fields: [classId], references: [id])
+  subject   Subject @relation(fields: [subjectId], references: [id])
+
+  tutors    TutorCategory[]
+
+  @@unique([classId, subjectId])
+}
+
+model TutorCategory {
+  tutorId    String
+  categoryId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tutor    TutorProfile @relation(fields: [tutorId], references: [id])
+  category Category     @relation(fields: [categoryId], references: [id])
+
+  @@id([tutorId, categoryId])
+}
+
+model Availability {
+  id        String @id @default(uuid())
+  tutorId   String
+  dayOfWeek Int      // 0 = Sunday, 6 = Saturday
+  startTime String   // "19:00"
+  endTime   String   // "22:00"
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tutor TutorProfile @relation(fields: [tutorId], references: [id])
+}
+
+model Booking {
+  id        String @id @default(uuid())
+  studentId String
+  tutorId   String
+
+  date      DateTime
+  startTime String
+  endTime   String
+  duration  Int        // minutes
+  status    BookingStatus @default(BOOKED)
+
+
+  student User         @relation("StudentBookings", fields: [studentId], references: [id])
+  tutor   TutorProfile @relation(fields: [tutorId], references: [id])
+  review  Review?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id        String @id @default(uuid())
+  rating    Int
+  comment   String
+
+  tutorId   String
+  studentId String
+  bookingId String @unique
+
+  tutor   TutorProfile @relation(fields: [tutorId], references: [id])
+  student User         @relation(fields: [studentId], references: [id])
+  booking Booking      @relation(fields: [bookingId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+
