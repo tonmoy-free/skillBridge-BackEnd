@@ -8,6 +8,7 @@ import { classRouter } from "./modules/class/class.router";
 import { subjectRouter } from "./modules/subject/subject.router";
 import { categoryRouter } from "./modules/category/category.router";
 import { assignTutorToCategoryRouter } from "./modules/assignTutorToCategory/assignTutorToCategory.router";
+import { availabilityRouter } from "./modules/availability/availability.router";
 
 
 const app: Application = express();
@@ -32,6 +33,8 @@ app.use("/subject", subjectRouter);
 app.use("/tutors/category", categoryRouter);
 
 app.use("/tutors/assign-tutor-to-category", assignTutorToCategoryRouter);
+
+app.use("/tutors/availability", availabilityRouter);
 
 app.get("/", (req, res) => {
     res.send("Hello world!");
