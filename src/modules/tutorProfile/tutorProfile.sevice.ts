@@ -9,6 +9,7 @@ const createTutorProfile = async (data: Omit<TutorProfile, "id" | "rating" | "cr
     const result = await prisma.tutorProfile.create({
         data
     })
+    return result;
 }
 
 export const tutorProfileService = {
