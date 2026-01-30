@@ -6,6 +6,8 @@ import cors from "cors";
 import { tutorProfileRouter } from "./modules/tutorProfile/tutorProfile.router";
 import { classRouter } from "./modules/class/class.router";
 import { subjectRouter } from "./modules/subject/subject.router";
+import { categoryRouter } from "./modules/category/category.router";
+
 
 const app: Application = express();
 
@@ -25,6 +27,8 @@ app.use("/tutors/tutors-profile", tutorProfileRouter);
 app.use("/class", classRouter);
 
 app.use("/subject", subjectRouter);
+
+app.use("/tutors/category", categoryRouter);
 
 app.get("/", (req, res) => {
     res.send("Hello world!");

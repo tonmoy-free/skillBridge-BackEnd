@@ -6,7 +6,7 @@ import { prisma } from "../../lib/prisma";
 
 //Omit => "id" |"createdAt" | "updatedAt" => ei gula data thakbe na baki gula thakbe
 const createSubject = async (data: Omit<Subject, "id" |"createdAt" | "updatedAt">) => {
-    const result = await prisma.class.create({
+    const result = await prisma.subject.create({
         data
     })
     return result;
