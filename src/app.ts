@@ -9,6 +9,7 @@ import { subjectRouter } from "./modules/subject/subject.router";
 import { categoryRouter } from "./modules/category/category.router";
 import { assignTutorToCategoryRouter } from "./modules/assignTutorToCategory/assignTutorToCategory.router";
 import { availabilityRouter } from "./modules/availability/availability.router";
+import { reviewRouter } from "./modules/review/review.router";
 
 
 const app: Application = express();
@@ -22,7 +23,7 @@ app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json());
 
-app.use("/posts", bookingRouter);
+app.use("/dashboard/booking", bookingRouter);
 
 app.use("/tutors/tutors-profile", tutorProfileRouter);
 
@@ -35,6 +36,9 @@ app.use("/tutors/category", categoryRouter);
 app.use("/tutors/assign-tutor-to-category", assignTutorToCategoryRouter);
 
 app.use("/tutors/availability", availabilityRouter);
+
+app.use("/tutors/review", reviewRouter);
+
 
 app.get("/", (req, res) => {
     res.send("Hello world!");
