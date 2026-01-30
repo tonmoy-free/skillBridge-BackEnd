@@ -4,6 +4,7 @@ import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
 import cors from "cors";
 import { tutorProfileRouter } from "./modules/tutorProfile/tutorProfile.router";
+import { classRouter } from "./modules/class/class.router";
 
 const app: Application = express();
 
@@ -18,7 +19,9 @@ app.use(express.json());
 
 app.use("/posts", bookingRouter);
 
-app.use("/tutor-profiles", tutorProfileRouter);
+app.use("/tutors/tutors-profile", tutorProfileRouter);
+
+app.use("/class", classRouter);
 
 app.get("/", (req, res) => {
     res.send("Hello world!");
