@@ -44,6 +44,7 @@ export const auth = betterAuth({
         requireEmailVerification: true,
     },
     emailVerification: {
+        sendOnSignUp: true,
         sendVerificationEmail: async ({ user, url, token }, request) => {
             try {
                 const verificationUrl = `${process.env.APP_URL}/verify-email?token=${token}`;
@@ -148,6 +149,7 @@ export const auth = betterAuth({
                 console.log("Message sent:", info.messageId);
             } catch (err) {
                 console.error("Error sending verification email:", err);
+                throw err;
             }
         },
     },
