@@ -10,8 +10,13 @@ const createClass = async (data: Omit<Class, "id" |"createdAt" | "updatedAt">) =
         data
     })
     return result;
+};
+
+const getAllClasses = async () => {
+    return await prisma.class.findMany();
 }
 
 export const classService = {
     createClass,
+    getAllClasses,
 }

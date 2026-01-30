@@ -8,6 +8,11 @@ const router = express.Router();
 router.post(
     "/",
     classController.createClass
+);
+
+router.get(
+    "/",
+    classController.getAllClasses
 )
 
 

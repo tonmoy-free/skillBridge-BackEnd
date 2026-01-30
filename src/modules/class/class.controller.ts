@@ -13,8 +13,21 @@ const createClass = async (req: Request, res: Response) => {
             details: e
         })
     }
+};
+
+const getAllClasses = async (req: Request, res: Response) => {
+    try {
+        const result = await classService.getAllClasses()
+        res.status(200).json(result)
+    } catch (e) {
+        res.status(400).json({
+            error: "Class fetched failed",
+            details: e
+        })
+    }
 }
 
 export const classController = {
     createClass,
+    getAllClasses,
 }
