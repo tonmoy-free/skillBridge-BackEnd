@@ -1,11 +1,16 @@
 import { Request, Response } from "express";
 import { bookingService } from "./booking.service";
-import { Booking } from "../../../generated/prisma/client";
-import { error } from "node:console";
+
 
 const createBooking = async (req: Request, res: Response) => {
     try {
-        const result = await bookingService.createBooking(req.body);
+        const user = req.user;
+        if (!user) {
+            return res.status(400).json({
+                error: "unauthorized",
+            })
+        }
+        const result = await bookingService.createBooking(req.body, user.id as string);
         res.status(201).json(result);
     } catch (e) {
         res.status(400).json({
