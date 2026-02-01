@@ -17,7 +17,9 @@ const createTutorProfile = async (req: Request, res: Response) => {
 
 const getAllTutorProfile = async (req: Request, res: Response) => {
     try {
-        const result = await tutorProfileService.getAllTutorProfile();
+        const {search} = req.query;
+        const searchString = typeof search === "string" ? search : undefined;
+        const result = await tutorProfileService.getAllTutorProfile({search: searchString});
         res.status(200).json(result);
     } catch (e) {
         res.status(400).json({

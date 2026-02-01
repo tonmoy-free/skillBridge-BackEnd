@@ -13,8 +13,16 @@ const createTutorProfile = async (data: Omit<TutorProfile, "id" | "rating" | "cr
     return result;
 };
 
-const getAllTutorProfile = async () => {
-    const result = await prisma.tutorProfile.findMany();
+const getAllTutorProfile = async (payload: { search?: string | undefined }) => {
+    const result = await prisma.tutorProfile.findMany({
+        where: {
+            bio: {
+                contains: payload.search as string,
+                mode: "insensitive"
+            },
+
+        }
+    });
     return result;
 }
 
