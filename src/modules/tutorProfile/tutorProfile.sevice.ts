@@ -1,3 +1,4 @@
+import { get } from "node:http";
 import { TutorProfile } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
@@ -10,8 +11,14 @@ const createTutorProfile = async (data: Omit<TutorProfile, "id" | "rating" | "cr
         data
     })
     return result;
+};
+
+const getAllTutorProfile = async () => {
+    const result = await prisma.tutorProfile.findMany();
+    return result;
 }
 
 export const tutorProfileService = {
     createTutorProfile,
+    getAllTutorProfile,
 }

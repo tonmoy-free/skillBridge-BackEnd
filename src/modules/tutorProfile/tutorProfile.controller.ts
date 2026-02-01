@@ -13,8 +13,21 @@ const createTutorProfile = async (req: Request, res: Response) => {
             details: e
         })
     }
+};
+
+const getAllTutorProfile = async (req: Request, res: Response) => {
+    try {
+        const result = await tutorProfileService.getAllTutorProfile();
+        res.status(200).json(result);
+    } catch (e) {
+        res.status(400).json({
+            error: "Failed to fetch tutor profiles",
+            details: e
+        })
+    }
 }
 
 export const tutorProfileController = {
     createTutorProfile,
+    getAllTutorProfile,
 }
