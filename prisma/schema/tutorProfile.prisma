@@ -1,0 +1,19 @@
+model TutorProfile {
+  id     String @id @default(uuid())
+  userId String @unique
+
+  bio        String
+  hourlyFee  Float // Tuition fee per hour
+  monthlyFee Float? // Optional monthly fee
+  experience Int // years
+  rating     Float  @default(0)
+
+  user         User            @relation(fields: [userId], references: [id])
+  categories   TutorCategory[]
+  availability Availability[]
+  bookings     Booking[]
+  reviews      Review[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
