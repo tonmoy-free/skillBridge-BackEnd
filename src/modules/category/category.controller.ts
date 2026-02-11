@@ -1,17 +1,18 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { categoryService } from "./category.service";
 
 
-const createCategory = async (req: Request, res: Response) => {
+const createCategory = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await categoryService.createCategory(req.body);
         res.status(201).json(result);
-        console.log("Category created successfully",result);
+        console.log("Category created successfully", result);
     } catch (e) {
-        res.status(400).json({
-            error: "Category creation failed",
-            details: e
-        })
+        // res.status(400).json({
+        //     error: "Category creation failed1",
+        //     details: e
+        // })
+        next(e);
     }
 }
 

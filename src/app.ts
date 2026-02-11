@@ -10,6 +10,7 @@ import { categoryRouter } from "./modules/category/category.router";
 import { assignTutorToCategoryRouter } from "./modules/assignTutorToCategory/assignTutorToCategory.router";
 import { availabilityRouter } from "./modules/availability/availability.router";
 import { reviewRouter } from "./modules/review/review.router";
+import errorHandler from "./middleware/globalErrorHandler";
 
 
 const app: Application = express();
@@ -38,6 +39,8 @@ app.use("/tutors/assign-tutor-to-category", assignTutorToCategoryRouter);
 app.use("/tutors/availability", availabilityRouter);
 
 app.use("/tutors/review", reviewRouter);
+
+app.use(errorHandler)
 
 
 app.get("/", (req, res) => {
