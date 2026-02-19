@@ -20,8 +20,16 @@ const getAllTutorProfile = async (payload: { search?: string | undefined }) => {
                 contains: payload.search as string,
                 mode: "insensitive"
             },
-
-        }
+        },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true, 
+                },
+            },
+        },
     });
     return result;
 }
