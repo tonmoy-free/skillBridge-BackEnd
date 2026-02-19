@@ -6,7 +6,12 @@ const router = express.Router();
 router.get(
     "/",
     tutorProfileController.getAllTutorProfile
-)
+);
+
+router.get(
+    "/:id",
+    tutorProfileController.getSingleTutorProfileById
+);
 
 
 router.post(

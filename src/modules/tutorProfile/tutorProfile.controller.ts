@@ -27,9 +27,26 @@ const getAllTutorProfile = async (req: Request, res: Response) => {
             details: e
         })
     }
+};
+
+const getSingleTutorProfileById = async (req: Request<{ id: string }>, res: Response) => {
+    try {
+        const { id } = req.params;
+        if (!id) {
+            throw new Error("Id is required!")
+        }
+        const result = await tutorProfileService.getSingleTutorProfileById(id);
+        res.status(200).json(result)
+    } catch (e) {
+        res.status(400).json({
+            error: "Post creation failed",
+            details: e
+        })
+    }
 }
 
 export const tutorProfileController = {
     createTutorProfile,
     getAllTutorProfile,
+    getSingleTutorProfileById,
 }

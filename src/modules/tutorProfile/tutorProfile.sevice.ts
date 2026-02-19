@@ -32,9 +32,28 @@ const getAllTutorProfile = async (payload: { search?: string | undefined }) => {
         },
     });
     return result;
-}
+};
+
+
+const getSingleTutorProfileById = async (id: string) => {
+    const result = await prisma.tutorProfile.findUnique({
+        where: { id },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                },
+            },
+        },
+    });
+
+    return result;
+};
 
 export const tutorProfileService = {
     createTutorProfile,
     getAllTutorProfile,
+    getSingleTutorProfileById,
 }
