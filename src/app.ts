@@ -11,6 +11,7 @@ import { assignTutorToCategoryRouter } from "./modules/assignTutorToCategory/ass
 import { availabilityRouter } from "./modules/availability/availability.router";
 import { reviewRouter } from "./modules/review/review.router";
 import errorHandler from "./middleware/globalErrorHandler";
+import { userRouter } from "./modules/users/user.router";
 
 
 const app: Application = express();
@@ -25,6 +26,8 @@ app.all("/api/auth/*splat", toNodeHandler(auth));
 app.use(express.json());
 
 app.use("/dashboard/booking", bookingRouter);
+
+app.use("/dashboard/user", userRouter);
 
 app.use("/tutors/tutors-profile", tutorProfileRouter);
 
