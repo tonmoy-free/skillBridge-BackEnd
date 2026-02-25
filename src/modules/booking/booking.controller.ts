@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { bookingService } from "./booking.service";
+import paginationSortingHelper from "../../helpers/paginationSortingHelper";
+import { BookingStatus } from "../../../generated/prisma/enums";
 
 
 const createBooking = async (req: Request, res: Response) => {
@@ -18,8 +20,38 @@ const createBooking = async (req: Request, res: Response) => {
             details: e
         })
     }
+};
+
+const getAllBooking = async (req: Request, res: Response) => {
+    try {
+        const search = typeof req.query.search === 'string' ? req.query.search : undefined
+        const status = req.query.status as BookingStatus | undefined
+        const tutorId = req.query.tutorId as string | undefined
+        const studentId = req.query.studentId as string | undefined
+
+        const { page, limit, skip, sortBy, sortOrder } = paginationSortingHelper(req.query)
+
+        const result = await bookingService.getAllBooking({
+            search,
+            status,
+            tutorId,
+            studentId,
+            page,
+            limit,
+            skip,
+            sortBy,
+            sortOrder
+        })
+        res.status(200).json(result)
+    } catch (e) {
+        res.status(400).json({
+            error: "Booking retrieval failed",
+            details: e
+        })
+    }
 }
 
 export const BookingController = {
     createBooking,
+    getAllBooking,
 }

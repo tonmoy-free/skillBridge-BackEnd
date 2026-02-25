@@ -1,26 +1,65 @@
+import { UserStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 
+const getAlluser = async ({
+  search,
+  status,
+  page,
+  limit,
+  skip,
+  sortBy,
+  sortOrder
+}: {
+  search: string | undefined,
+  status: UserStatus | undefined,
+  page: number,
+  limit: number,
+  skip: number,
+  sortBy: string,
+  sortOrder: string
+}) => {
+  // 1. Construct the filter object
+  const whereCondition: any = {};
 
-//Partial => typescript ke bole dewa kicu data thakbe kishu deta thakbe na
+  if (search) {
+    whereCondition.OR = [
+      { name: { contains: search, mode: "insensitive" } },
+      { email: { contains: search, mode: "insensitive" } },
+    ];
+  }
 
-//Omit => "id" |"createdAt" | "updatedAt" => ei gula data thakbe na baki gula thakbe
+  if (status) {
+    whereCondition.status = status;
+  }
 
+  // 2. Fetch data and total count in parallel for better performance
+  const [data, total] = await Promise.all([
+    prisma.user.findMany({
+      where: whereCondition,
+      skip: skip,
+      take: limit,
+      orderBy: {
+        [sortBy]: sortOrder,
+      },
+      // You can also include related data here
+      include: {
+        tutorProfile: true,
+      }
+    }),
+    prisma.user.count({ where: whereCondition }),
+  ]);
 
-const getAlluser = async (payload: { search?: string | undefined }) => {
-    const result = await prisma.user.findMany({
-        where: {
-            name: {
-                contains: payload.search as string,
-                mode: "insensitive"
-            },
-        },
-    });
-    return result;
+  return {
+    data,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    }
+  };
 };
 
-
-
-
 export const userService = {
-    getAlluser,
-}
+  getAlluser,
+};

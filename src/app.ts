@@ -12,6 +12,7 @@ import { availabilityRouter } from "./modules/availability/availability.router";
 import { reviewRouter } from "./modules/review/review.router";
 import errorHandler from "./middleware/globalErrorHandler";
 import { userRouter } from "./modules/users/user.router";
+import { UserRole } from "./middleware/auth";
 
 
 const app: Application = express();
@@ -27,7 +28,9 @@ app.use(express.json());
 
 app.use("/dashboard/booking", bookingRouter);
 
-app.use("/dashboard/user", userRouter);
+app.use("/dashboard/user",
+    
+     userRouter);
 
 app.use("/tutors/tutors-profile", tutorProfileRouter);
 
