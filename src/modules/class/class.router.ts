@@ -10,10 +10,21 @@ router.get(
     classController.getAllClasses
 )
 
+router.get(
+    "/:id",
+    classController.getSingleClassById
+)
+
 router.post(
     "/",
     classController.createClass
 );
+
+router.patch(
+    "/:id",
+    auth(UserRole.ADMIN),
+    classController.updateClass
+)
 
 router.delete(
     "/:id",
