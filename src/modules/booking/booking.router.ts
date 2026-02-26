@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get(
     "/",
-     auth(UserRole.ADMIN, UserRole.STUDENT, UserRole.TUTOR),
+    auth(UserRole.ADMIN, UserRole.STUDENT, UserRole.TUTOR),
     BookingController.getAllBooking,
 )
 

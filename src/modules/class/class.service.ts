@@ -14,9 +14,28 @@ const createClass = async (data: Omit<Class, "id" |"createdAt" | "updatedAt">) =
 
 const getAllClasses = async () => {
     return await prisma.class.findMany();
+};
+
+const deleteClass = async (id: string, isAdmin: boolean) => {
+    const postData = await prisma.class.findUniqueOrThrow({
+        where: {
+            id: id
+        },
+        select: {
+            id: true,
+        }
+    })
+
+    return await prisma.class.delete({
+        where: {
+            id: id
+        }
+    })
+
 }
 
 export const classService = {
     createClass,
     getAllClasses,
+    deleteClass,
 }
