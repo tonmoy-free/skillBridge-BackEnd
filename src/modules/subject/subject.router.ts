@@ -9,10 +9,17 @@ router.post(
     "/",
     auth(UserRole.ADMIN),
     subjectController.createSubject
-)
+);
+
 router.get(
     "/",
     subjectController.getAllSubject
+);
+
+router.delete(
+    "/:id",
+    auth(UserRole.ADMIN),
+    subjectController.deleteSubject
 )
 
 

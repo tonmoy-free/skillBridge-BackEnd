@@ -16,7 +16,26 @@ const getAllSubject = async () => {
     return await prisma.subject.findMany();
 };
 
+const deleteSubject = async (id: string, isAdmin: boolean) => {
+    const postData = await prisma.subject.findUniqueOrThrow({
+        where: {
+            id: id
+        },
+        select: {
+            id: true,
+        }
+    })
+
+    return await prisma.subject.delete({
+        where: {
+            id: id
+        }
+    })
+
+};
+
 export const subjectService = {
     createSubject,
-    getAllSubject
+    getAllSubject,
+    deleteSubject
 }
