@@ -13,8 +13,21 @@ const createSubject = async (req: Request, res: Response) => {
             details: e
         })
     }
-}
+};
+
+const getAllSubject= async (req: Request, res: Response) => {
+    try {
+        const result = await subjectService.getAllSubject();
+        res.status(200).json(result)
+    } catch (e) {
+        res.status(400).json({
+            error: "Subject fetched failed",
+            details: e
+        })
+    }
+};
 
 export const subjectController = {
     createSubject,
+    getAllSubject
 }

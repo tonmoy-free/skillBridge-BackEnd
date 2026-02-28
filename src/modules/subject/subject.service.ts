@@ -10,8 +10,13 @@ const createSubject = async (data: Omit<Subject, "id" |"createdAt" | "updatedAt"
         data
     })
     return result;
-}
+};
+
+const getAllSubject = async () => {
+    return await prisma.subject.findMany();
+};
 
 export const subjectService = {
     createSubject,
+    getAllSubject
 }
