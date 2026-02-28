@@ -64,7 +64,7 @@ const deleteClass = async (id: string, isAdmin: boolean) => {
         }
     })
 
-}
+};
 
 export const classService = {
     createClass,

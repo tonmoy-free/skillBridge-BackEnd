@@ -12,6 +12,12 @@ router.get(
     userController.getAllUser
 );
 
+router.delete(
+    "/:id",
+    auth(UserRole.ADMIN),
+    userController.deleteUser
+);
+
 router.patch(
     "/:id",
     auth(UserRole.ADMIN),

@@ -99,7 +99,26 @@ const updateUser = async (
   return result;
 };
 
+const deleteuser = async (id: string, isAdmin: boolean) => {
+    const postData = await prisma.user.findUniqueOrThrow({
+        where: {
+            id: id
+        },
+        select: {
+            id: true,
+        }
+    })
+
+    return await prisma.user.delete({
+        where: {
+            id: id
+        }
+    })
+
+}
+
 export const userService = {
   getAlluser,
-  updateUser
+  updateUser,
+  deleteuser
 };

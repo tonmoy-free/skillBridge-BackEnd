@@ -97,7 +97,7 @@ const deleteClass = async (req: Request, res: Response) => {
             details: e
         })
     }
-}
+};
 
 export const classController = {
     createClass,
