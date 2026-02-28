@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { userService } from "./user.service";
 import paginationSortingHelper from "../../helpers/paginationSortingHelper";
 import { UserStatus } from "../../../generated/prisma/enums";
+import { UserRole } from "../../middleware/auth";
+import { classService } from "../class/class.service";
 
 const getAllUser = async (req: Request, res: Response) => {
     try {
@@ -43,6 +45,31 @@ const getAllUser = async (req: Request, res: Response) => {
     }
 };
 
+
+const updateUser = async (req: Request, res: Response) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            throw new Error("You are unauthorized!")
+        }
+
+        const { id } = req.params;
+        const isAdmin = user.role === UserRole.ADMIN
+        const result = await userService.updateUser(id as string, req.body, isAdmin);
+        res.status(200).json({
+            success:true,
+            message: "User updated successfully",
+            data: result
+        })
+    } catch (e) {
+        res.status(400).json({
+            error: "User update failed",
+            details: e
+        })
+    }
+}
+
 export const userController = {
     getAllUser,
+    updateUser,
 };

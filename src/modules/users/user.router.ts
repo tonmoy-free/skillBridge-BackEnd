@@ -10,7 +10,15 @@ router.get(
     "/",
     auth(UserRole.ADMIN),
     userController.getAllUser
-)
+);
+
+router.patch(
+    "/:id",
+    auth(UserRole.ADMIN),
+    userController.updateUser
+);
+
+
 
 
 export const userRouter: Router = router;

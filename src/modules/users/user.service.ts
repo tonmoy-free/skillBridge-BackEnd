@@ -1,3 +1,4 @@
+import { User } from "../../../generated/prisma/client";
 import { UserStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 
@@ -60,6 +61,45 @@ const getAlluser = async ({
   };
 };
 
+const updateUser = async (
+  postId: string,
+  data: Partial<Pick<User, "role" | "status">>, // User থেকে শুধু role ও status নিয়ে সেগুলোকে ঐচ্ছিক করা হয়েছে
+  isAdmin: boolean
+) => {
+  const updateData = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: postId
+    },
+    select: {
+      id: true,
+    }
+  })
+
+  if (!isAdmin) {
+    throw new Error("You are unauthorized!")
+  }
+
+  // ১. ব্ল্যাঙ্ক ফিল্ডগুলো বাদ দিয়ে একটি নতুন অবজেক্ট তৈরি করুন
+  const filteredData = Object.fromEntries(
+    Object.entries(data).filter(([_, value]) => value !== undefined && value !== "")
+  );
+
+  // ২. যদি সব ফিল্ডই ব্ল্যাঙ্ক হয়, তবে আপডেট করার দরকার নেই
+  if (Object.keys(filteredData).length === 0) {
+    throw new Error("No valid data provided for update.");
+  }
+
+  const result = await prisma.user.update({
+    where: {
+      id: updateData.id
+    },
+    data: filteredData, // শুধু যেগুলোতে ভ্যালু আছে সেগুলোই আপডেট হবে
+  })
+
+  return result;
+};
+
 export const userService = {
   getAlluser,
+  updateUser
 };
