@@ -57,8 +57,50 @@ const deleteSubject = async (req: Request, res: Response) => {
     }
 };
 
+const updateSubject = async (req: Request, res: Response) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            throw new Error("You are unauthorized!")
+        }
+
+        const { id } = req.params;
+        const isAdmin = user.role === UserRole.ADMIN
+        const result = await subjectService.updateSubject(id as string, req.body, isAdmin);
+        res.status(200).json({
+            success:true,
+            message: "Subject updated successfully",
+            data: result
+        })
+    } catch (e) {
+        res.status(400).json({
+            error: "Subject update failed",
+            details: e
+        })
+    }
+};
+
+const getSingleSubjectById = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        if (!id) {
+            throw new Error("Subject ID is required")
+        }
+
+        const result = await subjectService.getSingleSubjectById(id as string);
+        res.status(200).json(result)
+    } catch (e) {
+        res.status(400).json({
+            error: "Subject fetched failed",
+            details: e
+        })
+    }
+};
+
 export const subjectController = {
     createSubject,
     getAllSubject,
-    deleteSubject
+    deleteSubject,
+    updateSubject,
+    getSingleSubjectById,
 }

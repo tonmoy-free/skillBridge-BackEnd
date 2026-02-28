@@ -16,10 +16,22 @@ router.get(
     subjectController.getAllSubject
 );
 
+router.get(
+    "/:id",
+    subjectController.getSingleSubjectById
+);
+
+
 router.delete(
     "/:id",
     auth(UserRole.ADMIN),
     subjectController.deleteSubject
+);
+
+router.patch(
+    "/:id",
+    auth(UserRole.ADMIN),
+    subjectController.updateSubject
 )
 
 

@@ -1,3 +1,4 @@
+import { get } from "node:http";
 import { Subject } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
@@ -34,8 +35,42 @@ const deleteSubject = async (id: string, isAdmin: boolean) => {
 
 };
 
+const updateSubject = async (postId: string, data: Partial<Subject>, isAdmin: boolean) => {
+    const postData = await prisma.subject.findUniqueOrThrow({
+        where: {
+            id: postId
+        },
+        select: {
+            id: true,
+        }
+    })
+
+    if (!isAdmin) {
+         throw new Error("You are unauthorized!")
+    }
+
+    const result = await prisma.subject.update({
+        where: {
+            id: postData.id
+        },
+        data
+    })
+
+    return result;
+};
+
+const getSingleSubjectById = async (id: string) => {
+    return await prisma.subject.findUnique({
+        where: {
+            id: id
+        }
+    })
+};
+
 export const subjectService = {
     createSubject,
     getAllSubject,
-    deleteSubject
+    deleteSubject,
+    updateSubject,
+    getSingleSubjectById,
 }

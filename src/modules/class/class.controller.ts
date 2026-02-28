@@ -65,7 +65,7 @@ const updateClass = async (req: Request, res: Response) => {
             details: e
         })
     }
-}
+};
 
 
 const deleteClass = async (req: Request, res: Response) => {
