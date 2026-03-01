@@ -40,6 +40,8 @@ app.use("/subject", subjectRouter);
 
 app.use("/tutors/category", categoryRouter);
 
+app.use("/category", categoryRouter);
+
 app.use("/tutors/assign-tutor-to-category", assignTutorToCategoryRouter);
 
 app.use("/tutors/availability", availabilityRouter);
