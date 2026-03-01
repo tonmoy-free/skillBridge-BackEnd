@@ -1,9 +1,8 @@
 import express, { NextFunction, Request, Response, Router } from 'express';
 import { categoryController } from './category.controller';
+import auth, { UserRole } from '../../middleware/auth';
 
 const router = express.Router();
-
-
 
 router.post(
     "/",
@@ -13,6 +12,12 @@ router.post(
 router.get(
     "/",
     categoryController.getAllCategory
+);
+
+router.delete(
+    "/:id",
+    auth(UserRole.ADMIN),
+    categoryController.deleteCategory
 );
 
 

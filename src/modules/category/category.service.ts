@@ -21,7 +21,26 @@ const getAllCategories = async () => {
     });
 };
 
+const deleteCategory = async (id: string, isAdmin: boolean) => {
+    const postData = await prisma.category.findUniqueOrThrow({
+        where: {
+            id: id
+        },
+        select: {
+            id: true,
+        }
+    })
+
+    return await prisma.category.delete({
+        where: {
+            id: id
+        }
+    })
+
+};
+
 export const categoryService = {
     createCategory,
-    getAllCategories
+    getAllCategories,
+    deleteCategory
 }
