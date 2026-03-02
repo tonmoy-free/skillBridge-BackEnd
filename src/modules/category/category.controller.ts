@@ -59,8 +59,51 @@ const deleteCategory = async (req: Request, res: Response) => {
     }
 };
 
+const updateCategory = async (req: Request, res: Response) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            throw new Error("You are unauthorized!")
+        }
+
+        const { id } = req.params;
+        const isAdmin = user.role === UserRole.ADMIN
+        const result = await categoryService.updateCategory(id as string, req.body, isAdmin);
+        res.status(200).json({
+            success:true,
+            message: "Category updated successfully",
+            data: result
+        })
+    } catch (e) {
+        res.status(400).json({
+            error: "Category update failed",
+            details: e
+        })
+    }
+};
+
+const getSingleCategoryById = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        if (!id) {
+            throw new Error("Category ID is required")
+        }
+
+        const result = await categoryService.getSingleCategoryById(id as string);
+        res.status(200).json(result)
+    } catch (e) {
+        res.status(400).json({
+            error: "Category fetched failed",
+            details: e
+        })
+    }
+};
+
+
 export const categoryController = {
     createCategory,
     getAllCategory,
-    deleteCategory
+    deleteCategory,
+    updateCategory,
+    getSingleCategoryById,
 }

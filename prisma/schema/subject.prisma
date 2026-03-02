@@ -1,9 +1,0 @@
-model Subject {
-  id   String @id @default(uuid())
-  name String @unique // Bangla, Math, Physics
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  categories Category[]
-}

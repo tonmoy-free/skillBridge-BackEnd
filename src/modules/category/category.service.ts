@@ -15,8 +15,7 @@ const createCategory = async (data: Omit<Category, "id" | "createdAt" | "updated
 const getAllCategories = async () => {
     return await prisma.category.findMany({
         include: {
-            class: true,
-            subject: true
+            tutors: true,
         }
     });
 };
@@ -39,8 +38,45 @@ const deleteCategory = async (id: string, isAdmin: boolean) => {
 
 };
 
+const updateCategory = async (postId: string, data: Partial<Category>, isAdmin: boolean) => {
+    const postData = await prisma.category.findUniqueOrThrow({
+        where: {
+            id: postId
+        },
+        select: {
+            id: true,
+        }
+    })
+
+    if (!isAdmin) {
+        throw new Error("You are unauthorized!")
+    }
+
+    const result = await prisma.category.update({
+        where: {
+            id: postData.id
+        },
+        data
+    })
+
+    return result;
+};
+
+const getSingleCategoryById = async (id: string) => {
+    return await prisma.category.findUnique({
+        where: {
+            id: id
+        },
+        include: {
+            tutors: true
+        }
+    })
+};
+
 export const categoryService = {
     createCategory,
     getAllCategories,
-    deleteCategory
+    deleteCategory,
+    updateCategory,
+    getSingleCategoryById,
 }

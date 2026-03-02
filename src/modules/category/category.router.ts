@@ -14,10 +14,21 @@ router.get(
     categoryController.getAllCategory
 );
 
+router.get(
+    "/:id",
+    categoryController.getSingleCategoryById
+);
+
 router.delete(
     "/:id",
     auth(UserRole.ADMIN),
     categoryController.deleteCategory
+);
+
+router.patch(
+    "/:id",
+    auth(UserRole.ADMIN),
+    categoryController.updateCategory
 );
 
 

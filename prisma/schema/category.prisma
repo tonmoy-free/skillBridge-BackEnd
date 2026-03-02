@@ -1,15 +1,11 @@
 model Category {
-  id        String @id @default(uuid())
-  classId   String
-  subjectId String
+  id   String @id @default(uuid())
+  name String @unique // Bangla, Math, Physics
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  class   Class   @relation(fields: [classId], references: [id])
-  subject Subject @relation(fields: [subjectId], references: [id])
+  tutors    TutorCategory[]
 
-  tutors TutorCategory[]
-
-  @@unique([classId, subjectId])
+  @@unique([id])
 }
