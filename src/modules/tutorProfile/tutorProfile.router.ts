@@ -17,7 +17,17 @@ router.get(
 router.post(
     "/",
     tutorProfileController.createTutorProfile,
-)
+);
+
+router.post(
+    "/:id",
+    tutorProfileController.assignTutorCategory
+);
+
+router.get(
+    "/",
+    tutorProfileController.getAllTutorUser
+);
 
 
 export const tutorProfileRouter: Router = router;

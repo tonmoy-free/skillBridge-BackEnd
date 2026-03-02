@@ -1,11 +1,10 @@
 model Category {
-  id   String @id @default(uuid())
-  name String @unique // Bangla, Math, Physics
+  id        String         @id @default(uuid())
+  name      String         @unique // "Physics", "Math", "Chemistry"
+  
+  // এই ফিল্ডটি টিউটরদের সাথে কানেক্ট করবে
+  tutorProfiles TutorProfile[] 
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  tutors    TutorCategory[]
-
-  @@unique([id])
 }

@@ -1,5 +1,5 @@
 import { get } from "node:http";
-import { TutorProfile } from "../../../generated/prisma/client";
+import {  TutorProfile } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
 
@@ -12,6 +12,8 @@ const createTutorProfile = async (data: Omit<TutorProfile, "id" | "rating" | "cr
     })
     return result;
 };
+
+
 
 const getAllTutorProfile = async (payload: { search?: string | undefined }) => {
     const result = await prisma.tutorProfile.findMany({
@@ -26,10 +28,11 @@ const getAllTutorProfile = async (payload: { search?: string | undefined }) => {
                 select: {
                     id: true,
                     name: true,
-                    email: true, 
-                    image:true,
+                    email: true,
+                    image: true,
                 },
             },
+            categories: true
         },
     });
     return result;
@@ -45,7 +48,7 @@ const getSingleTutorProfileById = async (id: string) => {
                     id: true,
                     name: true,
                     email: true,
-                    image:true,
+                    image: true,
                 },
             },
         },
@@ -54,8 +57,27 @@ const getSingleTutorProfileById = async (id: string) => {
     return result;
 };
 
+const getAllTutorUser = async (payload: { search?: string | undefined }) => {
+    const whereCondition: any = { role: "TUTOR" };
+
+    if (payload.search) {
+        whereCondition.name = {
+            contains: payload.search,
+            mode: "insensitive",
+        };
+    }
+
+    const result = await prisma.user.findMany({
+        where: whereCondition,
+        include: { tutorProfile: true }
+    });
+    return result;
+};
+
+
 export const tutorProfileService = {
     createTutorProfile,
     getAllTutorProfile,
     getSingleTutorProfileById,
+    getAllTutorUser,
 }

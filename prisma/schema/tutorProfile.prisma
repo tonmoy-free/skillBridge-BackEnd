@@ -9,7 +9,7 @@ model TutorProfile {
   rating     Float  @default(0)
 
   user         User            @relation(fields: [userId], references: [id])
-  categories   TutorCategory[]
+  categories   Category[]
   availability Availability[]
   bookings     Booking[]
   reviews      Review[]

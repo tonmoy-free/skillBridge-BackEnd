@@ -15,7 +15,7 @@ const createCategory = async (data: Omit<Category, "id" | "createdAt" | "updated
 const getAllCategories = async () => {
     return await prisma.category.findMany({
         include: {
-            tutors: true,
+            tutorProfiles: true,
         }
     });
 };
@@ -68,7 +68,7 @@ const getSingleCategoryById = async (id: string) => {
             id: id
         },
         include: {
-            tutors: true
+            tutorProfiles: true
         }
     })
 };
