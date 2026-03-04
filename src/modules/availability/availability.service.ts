@@ -14,7 +14,7 @@ const createAvailability = async (data: Omit<Availability, "id" | "isActive" | "
 
 const getAvailabilityById = async (id: string) => {
     const result = await prisma.availability.findMany({
-        where: { tutorId : id },
+        where: { tutorId: id },
         include: {
             tutor: {
                 select: {
@@ -33,7 +33,29 @@ const getAvailabilityById = async (id: string) => {
     return result;
 };
 
+
+const deleteAvailabilityBYid = async (id: string, isTutor: boolean) => {
+    const postData = await prisma.availability.findUniqueOrThrow({
+        where: {
+            id: id
+        },
+        select: {
+            id: true,
+        }
+    })
+
+    return await prisma.availability.delete({
+        where: {
+            id: id
+        }
+    })
+
+};
+
+
+
 export const availabilityService = {
     createAvailability,
-    getAvailabilityById
+    getAvailabilityById,
+    deleteAvailabilityBYid
 } 
