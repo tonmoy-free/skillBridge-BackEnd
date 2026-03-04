@@ -19,10 +19,6 @@ router.post(
     tutorProfileController.createTutorProfile,
 );
 
-router.post(
-    "/:id",
-    tutorProfileController.assignTutorCategory
-);
 
 router.get(
     "/",

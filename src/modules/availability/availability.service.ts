@@ -10,8 +10,30 @@ const createAvailability = async (data: Omit<Availability, "id" | "isActive" | "
         data
     })
     return result;
-}
+};
+
+const getAvailabilityById = async (id: string) => {
+    const result = await prisma.availability.findMany({
+        where: { tutorId : id },
+        include: {
+            tutor: {
+                select: {
+                    id: true,
+                    userId: true,
+                    bio: true,
+                    hourlyFee: true,
+                    monthlyFee: true,
+                    experience: true,
+                    rating: true,
+                },
+            },
+        },
+    });
+
+    return result;
+};
 
 export const availabilityService = {
     createAvailability,
+    getAvailabilityById
 } 

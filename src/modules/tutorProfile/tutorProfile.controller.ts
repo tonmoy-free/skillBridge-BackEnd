@@ -18,38 +18,38 @@ const createTutorProfile = async (req: Request, res: Response) => {
     }
 };
 
-const assignTutorCategory = async (req: Request, res: Response) => {
-    try {
-        // ১. বডি থেকে প্রয়োজনীয় ডাটা বের করে নিন
-        const { tutorId, categoryId, ...updateData } = req.body;
+// const assignTutorCategory = async (req: Request, res: Response) => {
+//     try {
+//         // ১. বডি থেকে প্রয়োজনীয় ডাটা বের করে নিন
+//         const { tutorId, categoryId, ...updateData } = req.body;
         
-        // ২. রিকোয়েস্ট ইউজার থেকে অ্যাডমিন স্ট্যাটাস নিন (আপনার Auth Middleware অনুযায়ী)
-        // সাধারণত req.user এ এই তথ্য থাকে
-        const isAdmin = req.user?.role === "ADMIN"; 
+//         // ২. রিকোয়েস্ট ইউজার থেকে অ্যাডমিন স্ট্যাটাস নিন (আপনার Auth Middleware অনুযায়ী)
+//         // সাধারণত req.user এ এই তথ্য থাকে
+//         const isAdmin = req.user?.role === "ADMIN"; 
 
-        // ৩. সার্ভিসে আলাদা আলাদা প্যারামিটার হিসেবে ডাটা পাস করুন
-        const result = await tutorProfileService.assignTutorCategory(
-            tutorId, 
-            categoryId, 
-            updateData, 
-            isAdmin
-        );
+//         // ৩. সার্ভিসে আলাদা আলাদা প্যারামিটার হিসেবে ডাটা পাস করুন
+//         const result = await tutorProfileService.assignTutorCategory(
+//             tutorId, 
+//             categoryId, 
+//             updateData, 
+//             isAdmin
+//         );
 
-        return res.status(200).json({ // আপডেট বা অ্যাসাইনমেন্টের জন্য ২০০ ব্যবহার করা ভালো
-            success: true,
-            message: "Tutor Category assigned/updated successfully",
-            data: result
-        });
+//         return res.status(200).json({ // আপডেট বা অ্যাসাইনমেন্টের জন্য ২০০ ব্যবহার করা ভালো
+//             success: true,
+//             message: "Tutor Category assigned/updated successfully",
+//             data: result
+//         });
         
-    } catch (e: any) {
-        console.error("Assignment Error:", e);
-        return res.status(e.message === "You are unauthorized!" ? 403 : 400).json({
-            success: false,
-            error: "Assignment failed",
-            message: e instanceof Error ? e.message : "Internal Server Error"
-        });
-    }
-};
+//     } catch (e: any) {
+//         console.error("Assignment Error:", e);
+//         return res.status(e.message === "You are unauthorized!" ? 403 : 400).json({
+//             success: false,
+//             error: "Assignment failed",
+//             message: e instanceof Error ? e.message : "Internal Server Error"
+//         });
+//     }
+// };
 
 const getAllTutorProfile = async (req: Request, res: Response) => {
     try {
@@ -109,5 +109,4 @@ export const tutorProfileController = {
     getAllTutorProfile,
     getSingleTutorProfileById,
     getAllTutorUser,
-    assignTutorCategory
 }

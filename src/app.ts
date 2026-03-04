@@ -44,7 +44,7 @@ app.use("/category", categoryRouter);
 
 app.use("/tutors/assign-tutor-to-category", assignTutorToCategoryRouter);
 
-app.use("/tutors/availability", availabilityRouter);
+app.use("/tutor/availability", availabilityRouter);
 
 app.use("/tutors/review", reviewRouter);
 
