@@ -81,19 +81,51 @@ const getAllTutorUser = async (payload: { search?: string | undefined }) => {
     return result;
 };
 
-const updateTutorProfile = async (userId: string, data: TutorProfile, isAdmin: boolean) => {
+// const updateTutorProfile = async (userId: string, data: TutorProfile, isAdmin: boolean) => {
+//     if (!isAdmin) {
+//         throw new Error("You are unauthorized!");
+//     }
+
+//     const result = await prisma.tutorProfile.upsert({
+//         where: {
+//             userId: userId,
+//         },
+//         update: data, // If found, update with this data
+//         create: {     // If not found, create with this data + userId
+//             ...data,
+//             userId: userId,
+//         },
+//     });
+
+//     return result;
+// };
+
+const updateTutorProfile = async (userId: string, data: any, isAdmin: boolean) => {
     if (!isAdmin) {
         throw new Error("You are unauthorized!");
     }
+
+    // Extract categoryIds from data and separate from the main profile fields
+    const { categoryIds, ...profileData } = data;
 
     const result = await prisma.tutorProfile.upsert({
         where: {
             userId: userId,
         },
-        update: data, // If found, update with this data
-        create: {     // If not found, create with this data + userId
-            ...data,
+        update: {
+            ...profileData,
+            // Sync categories: This removes old ones and adds the new ones
+            categories: {
+                set: categoryIds?.map((id: string) => ({ id })) || [],
+            },
+        },
+        create: {
+            ...profileData,
             userId: userId,
+            // Connect categories on creation
+            categories: {
+                connect: categoryIds?.map((id: string) => ({ id })) || [],
+            },
         },
     });
 
