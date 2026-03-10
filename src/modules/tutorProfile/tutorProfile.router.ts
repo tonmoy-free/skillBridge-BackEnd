@@ -1,5 +1,7 @@
 import express, { NextFunction, Request, Response, Router } from 'express';
 import { tutorProfileController } from './tutorProfile.controller';
+import auth, { UserRole } from '../../middleware/auth';
+
 
 const router = express.Router();
 
@@ -23,6 +25,12 @@ router.post(
 router.get(
     "/",
     tutorProfileController.getAllTutorUser
+);
+
+router.patch(
+    "/:id",
+    auth(UserRole.TUTOR, UserRole.ADMIN),
+    tutorProfileController.updateTutorProfile
 );
 
 

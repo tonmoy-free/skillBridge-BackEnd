@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { tutorProfileService } from "./tutorProfile.sevice";
+import { UserRole } from "../../middleware/auth";
 
 
 const createTutorProfile = async (req: Request, res: Response) => {
@@ -104,9 +105,33 @@ const getAllTutorUser = async (req: Request, res: Response) => {
     }
 };
 
+const updateTutorProfile = async (req: Request, res: Response) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            throw new Error("You are unauthorized!")
+        }
+
+        const { id } = req.params;
+        const isAdmin = user.role === UserRole.TUTOR
+        const result = await tutorProfileService.updateTutorProfile(id as string, req.body, isAdmin);
+        res.status(200).json({
+            success:true,
+            message: "Tutor profile updated successfully",
+            data: result
+        })
+    } catch (e) {
+        res.status(400).json({
+            error: "Tutor profile update failed",
+            details: e
+        })
+    }
+};
+
 export const tutorProfileController = {
     createTutorProfile,
     getAllTutorProfile,
     getSingleTutorProfileById,
     getAllTutorUser,
+    updateTutorProfile
 }

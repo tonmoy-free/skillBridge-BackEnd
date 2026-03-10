@@ -1,5 +1,5 @@
 import { get } from "node:http";
-import {  TutorProfile } from "../../../generated/prisma/client";
+import { TutorProfile } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
 
@@ -32,7 +32,10 @@ const getAllTutorProfile = async (payload: { search?: string | undefined }) => {
                     image: true,
                 },
             },
-            categories: true
+            categories: true,
+            availability: true,
+            bookings: true,
+            reviews: true
         },
     });
     return result;
@@ -41,7 +44,7 @@ const getAllTutorProfile = async (payload: { search?: string | undefined }) => {
 
 const getSingleTutorProfileById = async (id: string) => {
     const result = await prisma.tutorProfile.findUnique({
-        where: { userId : id },
+        where: { userId: id },
         include: {
             user: {
                 select: {
@@ -51,6 +54,10 @@ const getSingleTutorProfileById = async (id: string) => {
                     image: true,
                 },
             },
+            categories: true,
+            availability: true,
+            bookings: true,
+            reviews: true
         },
     });
 
@@ -74,10 +81,30 @@ const getAllTutorUser = async (payload: { search?: string | undefined }) => {
     return result;
 };
 
+const updateTutorProfile = async (userId: string, data: TutorProfile, isAdmin: boolean) => {
+    if (!isAdmin) {
+        throw new Error("You are unauthorized!");
+    }
+
+    const result = await prisma.tutorProfile.upsert({
+        where: {
+            userId: userId,
+        },
+        update: data, // If found, update with this data
+        create: {     // If not found, create with this data + userId
+            ...data,
+            userId: userId,
+        },
+    });
+
+    return result;
+};
+
 
 export const tutorProfileService = {
     createTutorProfile,
     getAllTutorProfile,
     getSingleTutorProfileById,
     getAllTutorUser,
+    updateTutorProfile
 }
