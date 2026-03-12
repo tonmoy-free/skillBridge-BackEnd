@@ -49,9 +49,37 @@ const getAllBooking = async (req: Request, res: Response) => {
             details: e
         })
     }
-}
+};
+
+const createBookingIntoDB = async (req: Request, res: Response) => {
+    try {
+        const bookingData = req.body;
+
+        // সার্ভিসকে কল করা
+        const result = await bookingService.createBookingIntoDB(bookingData);
+
+        // সফল রেসপন্স
+        return res.status(201).json({
+            success: true,
+            message: "Booking created successfully!",
+            data: result,
+        });
+
+    } catch (error: any) {
+        // সার্ভিস থেকে আসা এরর বা অন্য যেকোনো এরর হ্যান্ডেল করা
+        const statusCode = error.message.includes("already booked") ? 400 : 500;
+
+        return res.status(statusCode).json({
+            success: false,
+            message: error.message || "Internal server error",
+        });
+    }
+};
+
+
 
 export const BookingController = {
     createBooking,
     getAllBooking,
+    createBookingIntoDB
 }

@@ -9,13 +9,19 @@ router.get(
     "/",
     auth(UserRole.ADMIN, UserRole.STUDENT, UserRole.TUTOR),
     BookingController.getAllBooking,
-)
+);
+
+// router.post(
+//     "/",
+//     auth(UserRole.ADMIN, UserRole.STUDENT),
+//     BookingController.createBooking,
+// );
 
 router.post(
     "/",
     auth(UserRole.ADMIN, UserRole.STUDENT),
-    BookingController.createBooking,
-)
+    BookingController.createBookingIntoDB,
+);
 
 
 export const bookingRouter: Router = router;

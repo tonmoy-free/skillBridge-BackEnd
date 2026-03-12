@@ -111,8 +111,61 @@ const getAllBooking = async ({
 }
 
 
+const createBookingIntoDB = async (payload: {
+  tutorId: string;
+  studentId: string;
+  date: string | Date;
+  startTime: string;
+  endTime: string;
+  duration: number;
+}) => {
+  const { tutorId, date, startTime, studentId, endTime, duration } = payload;
+
+  // ১. চেক করা ওই সময়ে টিউটর খালি আছে কিনা
+  const existingBooking = await prisma.booking.findFirst({
+    where: {
+      tutorId: tutorId,
+      date: new Date(date), // নিশ্চিত করুন এটা Date অবজেক্ট
+      startTime: startTime,
+      status: {
+        not: BookingStatus.CANCELLED,
+      },
+    },
+  });
+
+  if (existingBooking) {
+    throw new Error("This time slot is already booked for this tutor.");
+  }
+
+  // ২. বুকিং তৈরি করা (Connect পদ্ধতি ব্যবহার করে)
+  const result = await prisma.booking.create({
+    data: {
+      date: new Date(date),
+      startTime,
+      endTime,
+      duration: Number(duration), // নিশ্চিত করুন এটা Number
+      status: BookingStatus.BOOKED,
+      // রিলেশন হ্যান্ডেল করার সঠিক উপায়
+      student: {
+        connect: { id: studentId },
+      },
+      tutor: {
+        connect: { id: tutorId },
+      },
+    },
+    // চাইলে রিটার্ন ডাটাতে স্টুডেন্ট বা টিউটরের ডিটেইলস ইনক্লুড করতে পারেন
+    include: {
+      tutor: true,
+      student: true,
+    }
+  });
+  return result;
+};
+
+
 
 export const bookingService = {
     createBooking,
     getAllBooking,
+    createBookingIntoDB
 }
