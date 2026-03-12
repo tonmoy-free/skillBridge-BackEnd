@@ -5,10 +5,16 @@ import auth, { UserRole } from '../../middleware/auth';
 
 const router = express.Router();
 
+// router.get(
+//     "/",
+//     auth(UserRole.ADMIN, UserRole.STUDENT, UserRole.TUTOR),
+//     BookingController.getAllBooking,
+// );
+
 router.get(
     "/",
     auth(UserRole.ADMIN, UserRole.STUDENT, UserRole.TUTOR),
-    BookingController.getAllBooking,
+    BookingController.getMyBookingsFromDB,
 );
 
 // router.post(
@@ -21,6 +27,11 @@ router.post(
     "/",
     auth(UserRole.ADMIN, UserRole.STUDENT),
     BookingController.createBookingIntoDB,
+);
+router.patch(
+    "/:id",
+    auth(UserRole.ADMIN, UserRole.STUDENT),
+    BookingController.cancelBookingFromDB
 );
 
 

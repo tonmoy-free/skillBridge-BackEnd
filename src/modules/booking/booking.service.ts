@@ -112,54 +112,115 @@ const getAllBooking = async ({
 
 
 const createBookingIntoDB = async (payload: {
-  tutorId: string;
-  studentId: string;
-  date: string | Date;
-  startTime: string;
-  endTime: string;
-  duration: number;
+    tutorId: string;
+    studentId: string;
+    date: string | Date;
+    startTime: string;
+    endTime: string;
+    duration: number;
 }) => {
-  const { tutorId, date, startTime, studentId, endTime, duration } = payload;
+    const { tutorId, date, startTime, studentId, endTime, duration } = payload;
 
-  // ১. চেক করা ওই সময়ে টিউটর খালি আছে কিনা
-  const existingBooking = await prisma.booking.findFirst({
-    where: {
-      tutorId: tutorId,
-      date: new Date(date), // নিশ্চিত করুন এটা Date অবজেক্ট
-      startTime: startTime,
-      status: {
-        not: BookingStatus.CANCELLED,
-      },
-    },
-  });
+    // ১. চেক করা ওই সময়ে টিউটর খালি আছে কিনা
+    const existingBooking = await prisma.booking.findFirst({
+        where: {
+            tutorId: tutorId,
+            date: new Date(date), // নিশ্চিত করুন এটা Date অবজেক্ট
+            startTime: startTime,
+            status: {
+                not: BookingStatus.CANCELLED,
+            },
+        },
+    });
 
-  if (existingBooking) {
-    throw new Error("This time slot is already booked for this tutor.");
-  }
-
-  // ২. বুকিং তৈরি করা (Connect পদ্ধতি ব্যবহার করে)
-  const result = await prisma.booking.create({
-    data: {
-      date: new Date(date),
-      startTime,
-      endTime,
-      duration: Number(duration), // নিশ্চিত করুন এটা Number
-      status: BookingStatus.BOOKED,
-      // রিলেশন হ্যান্ডেল করার সঠিক উপায়
-      student: {
-        connect: { id: studentId },
-      },
-      tutor: {
-        connect: { id: tutorId },
-      },
-    },
-    // চাইলে রিটার্ন ডাটাতে স্টুডেন্ট বা টিউটরের ডিটেইলস ইনক্লুড করতে পারেন
-    include: {
-      tutor: true,
-      student: true,
+    if (existingBooking) {
+        throw new Error("This time slot is already booked for this tutor.");
     }
-  });
-  return result;
+
+    // ২. বুকিং তৈরি করা (Connect পদ্ধতি ব্যবহার করে)
+    const result = await prisma.booking.create({
+        data: {
+            date: new Date(date),
+            startTime,
+            endTime,
+            duration: Number(duration), // নিশ্চিত করুন এটা Number
+            status: BookingStatus.BOOKED,
+            // রিলেশন হ্যান্ডেল করার সঠিক উপায়
+            student: {
+                connect: { id: studentId },
+            },
+            tutor: {
+                connect: { id: tutorId },
+            },
+        },
+        // চাইলে রিটার্ন ডাটাতে স্টুডেন্ট বা টিউটরের ডিটেইলস ইনক্লুড করতে পারেন
+        include: {
+            tutor: true,
+            student: true,
+        }
+    });
+    return result;
+};
+
+const getMyBookingsFromDB = async (userId: string, role: string) => {
+    let whereCondition = {};
+
+    if (role === "STUDENT") {
+        // স্টুডেন্ট শুধু তার নিজের করা বুকিং দেখবে
+        whereCondition = { studentId: userId };
+    } else if (role === "TUTOR") {
+        // টিউটর শুধু তার কাছে আসা বুকিংগুলো দেখবে
+        // আপনার স্কিমা অনুযায়ী TutorProfile এর মাধ্যমে userId দিয়ে ফিল্টার করছি
+        whereCondition = {
+            tutor: {
+                userId: userId
+            }
+        };
+    }
+
+    const result = await prisma.booking.findMany({
+        where: whereCondition,
+        include: {
+            tutor: {
+                include: { user: true }
+            },
+            student: true
+        },
+        orderBy: { date: 'asc' }
+    });
+
+    return result;
+};
+
+
+const cancelBookingFromDB = async (bookingId: string, userId: string, role: string) => {
+    // ১. চেক করা যে বুকিংটি আসলেই এই ইউজারের কি না
+    const booking = await prisma.booking.findUnique({
+        where: { id: bookingId },
+        include: { tutor: true }
+    });
+
+    if (!booking) {
+        throw new Error("Booking not found!");
+    }
+
+    // ২. সিকিউরিটি চেক: শুধু সংশ্লিষ্ট স্টুডেন্ট বা টিউটরই ক্যান্সেল করতে পারবে
+    const isStudent = booking.studentId === userId;
+    const isTutor = booking.tutor.userId === userId;
+
+    if (!isStudent && !isTutor) {
+        throw new Error("You are not authorized to cancel this booking!");
+    }
+
+    // ৩. স্ট্যাটাস আপডেট করা
+    const result = await prisma.booking.update({
+        where: { id: bookingId },
+        data: {
+            status: BookingStatus.CANCELLED,
+        },
+    });
+
+    return result;
 };
 
 
@@ -167,5 +228,7 @@ const createBookingIntoDB = async (payload: {
 export const bookingService = {
     createBooking,
     getAllBooking,
-    createBookingIntoDB
+    createBookingIntoDB,
+    getMyBookingsFromDB,
+    cancelBookingFromDB
 }
