@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response, Router } from 'express';
 import { reviewController } from './review.controller';
+import auth, { UserRole } from '../../middleware/auth';
 
 const router = express.Router();
 
@@ -7,7 +8,8 @@ const router = express.Router();
 
 router.post(
     "/",
-    reviewController.createReview,
+    auth(UserRole.STUDENT),
+    reviewController.createReviewIntoDB,
 )
 
 

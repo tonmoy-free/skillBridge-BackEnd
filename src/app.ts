@@ -1,5 +1,5 @@
 import express, { Application } from "express";
-import { bookingRouter} from "./modules/booking/booking.router";
+import { bookingRouter } from "./modules/booking/booking.router";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
 import cors from "cors";
@@ -13,6 +13,8 @@ import { reviewRouter } from "./modules/review/review.router";
 import errorHandler from "./middleware/globalErrorHandler";
 import { userRouter } from "./modules/users/user.router";
 import { UserRole } from "./middleware/auth";
+import cron from "node-cron";
+import { bookingService } from "./modules/booking/booking.service";
 
 
 const app: Application = express();
@@ -29,8 +31,8 @@ app.use(express.json());
 app.use("/dashboard/booking", bookingRouter);
 
 app.use("/dashboard/user",
-    
-     userRouter);
+
+    userRouter);
 
 app.use("/tutors/tutors-profile", tutorProfileRouter);
 
@@ -54,5 +56,16 @@ app.use(errorHandler)
 app.get("/", (req, res) => {
     res.send("Hello world!");
 })
+
+// প্রতি ১ ঘন্টা পরপর এই টাস্কটি চলবে (0 * * * *)
+cron.schedule("0 * * * *", async () => {
+    console.log("Checking for completed bookings...");
+    try {
+        const result = await bookingService.autoUpdateBookingStatus();
+        console.log(`${result.count} bookings marked as COMPLETED.`);
+    } catch (error) {
+        console.error("Cron job error:", error);
+    }
+});
 
 export default app;

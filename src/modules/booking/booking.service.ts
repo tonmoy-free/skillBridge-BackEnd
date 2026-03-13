@@ -223,6 +223,26 @@ const cancelBookingFromDB = async (bookingId: string, userId: string, role: stri
     return result;
 };
 
+const autoUpdateBookingStatus = async () => {
+    const currentTime = new Date();
+
+    // ১. সেই বুকিংগুলো খুঁজে বের করা যেগুলোর তারিখ আজকের বা আগের 
+    // এবং যেগুলোর স্ট্যাটাস এখনো 'BOOKED' আছে
+    const result = await prisma.booking.updateMany({
+        where: {
+            status: BookingStatus.BOOKED,
+            date: {
+                lt: currentTime, // বর্তমান সময়ের চেয়ে কম (অতীতের তারিখ)
+            },
+        },
+        data: {
+            status: BookingStatus.COMPLETED,
+        },
+    });
+
+    return result;
+};
+
 
 
 export const bookingService = {
@@ -230,5 +250,7 @@ export const bookingService = {
     getAllBooking,
     createBookingIntoDB,
     getMyBookingsFromDB,
-    cancelBookingFromDB
+    cancelBookingFromDB,
+    autoUpdateBookingStatus
+     
 }
