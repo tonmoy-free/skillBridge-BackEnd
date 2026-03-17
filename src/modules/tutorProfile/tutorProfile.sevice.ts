@@ -133,10 +133,52 @@ const updateTutorProfile = async (userId: string, data: any, isAdmin: boolean) =
 };
 
 
+
+const getSingleTutorUserById = async (id: string) => {
+    return await prisma.user.findUnique({
+        where: {
+            id: id
+        }
+    })
+};
+
+
+const updateTutorUserProfileInDBbyId = async (
+  userId: string,
+  updateData: { name?: string; image?: string; phone?: string }
+) => {
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { ...updateData },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        image: true,
+        phone: true,
+        role: true,
+        status: true,
+      },
+    });
+
+    return updatedUser;
+  } catch (error: any) {
+    // Prisma error code for record not found
+    if (error.code === "P2025") {
+      throw new Error("User not found.");
+    }
+    throw new Error(error.message || "Failed to update user profile.");
+  }
+}
+
+
 export const tutorProfileService = {
     createTutorProfile,
     getAllTutorProfile,
     getSingleTutorProfileById,
     getAllTutorUser,
-    updateTutorProfile
+    updateTutorProfile,
+    getSingleTutorUserById,
+    updateTutorUserProfileInDBbyId
 }

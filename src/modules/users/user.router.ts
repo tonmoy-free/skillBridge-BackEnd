@@ -12,6 +12,12 @@ router.get(
     userController.getAllUser
 );
 
+router.get(
+    "/:id",
+    auth(UserRole.ADMIN,UserRole.STUDENT),
+    userController.getSingleStudentById
+);
+
 router.delete(
     "/:id",
     auth(UserRole.ADMIN),
@@ -22,6 +28,12 @@ router.patch(
     "/:id",
     auth(UserRole.ADMIN),
     userController.updateUser
+);
+
+router.patch(
+    "/student/:id",
+    auth(UserRole.ADMIN,UserRole.STUDENT),
+    userController.updateUserInDBbyId
 );
 
 

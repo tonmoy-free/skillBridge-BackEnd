@@ -244,6 +244,44 @@ const autoUpdateBookingStatus = async () => {
 };
 
 
+const isTutorOwner = async (tutorProfileId: string, loggedInUserId: string) => {
+    const tutor = await prisma.tutorProfile.findUnique({
+        where: {
+            userId: tutorProfileId,
+        },
+        select: {
+            id: true, // টিউটর প্রোফাইল টেবিল থেকে userId নিচ্ছি
+        }
+    });
+
+    console.log("tutorProfileId",tutorProfileId)
+    console.log("tutor.id",tutor?.id)
+    console.log("loggedInUserId",loggedInUserId)
+    // যদি টিউটর প্রোফাইল পাওয়া যায় এবং তার userId লগইন করা ইউজারের সাথে মিলে যায়
+    return tutor?.id;
+};
+
+// সেশন নিয়ে আসার মেথড (আপনার আগের কোড)
+const getTutorSessionsbyIdFromDB = async (id: string) => {
+    return await prisma.booking.findMany({
+        where: {
+            tutorId: id, // এখানে টিউটর প্রোফাইল আইডি ব্যবহার হচ্ছে
+        },
+        include: {
+            student: {
+                select: {
+                    name: true,
+                    email: true,
+                    image: true,
+                },
+            },
+        },
+        orderBy: {
+            date: "desc",
+        },
+    });
+};
+
 
 export const bookingService = {
     createBooking,
@@ -251,6 +289,8 @@ export const bookingService = {
     createBookingIntoDB,
     getMyBookingsFromDB,
     cancelBookingFromDB,
-    autoUpdateBookingStatus
+    autoUpdateBookingStatus,
+    getTutorSessionsbyIdFromDB,
+    isTutorOwner
      
 }

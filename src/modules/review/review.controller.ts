@@ -3,16 +3,16 @@ import { reviewService } from "./review.service";
 
 
 const createReview = async (req: Request, res: Response) => {
-    try {
-        const result = await reviewService.createReview(req.body);
-        res.status(201).json(result);
-        console.log("Review created successfully",result);
-    } catch (e) {
-        res.status(400).json({
-            error: "Review creation failed",
-            details: e
-        })
-    }
+  try {
+    const result = await reviewService.createReview(req.body);
+    res.status(201).json(result);
+    console.log("Review created successfully", result);
+  } catch (e) {
+    res.status(400).json({
+      error: "Review creation failed",
+      details: e
+    })
+  }
 };
 
 const createReviewIntoDB = async (req: Request, res: Response) => {
@@ -43,7 +43,41 @@ const createReviewIntoDB = async (req: Request, res: Response) => {
   }
 };
 
+const getTutorReviewsById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params; 
+    const user = (req as any).user; 
+
+    
+
+    const tutorId = await reviewService.tutorId(id as string, user.id);
+
+    const result = await reviewService.getTutorReviewsFromDB(tutorId as string);
+
+    if (!result) {
+      res.status(404).json({
+        success: false,
+        message: "Tutor profile not found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Tutor reviews retrieved successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
+    });
+  }
+}
+
 export const reviewController = {
-    createReview,
-    createReviewIntoDB
+  createReview,
+  createReviewIntoDB,
+  getTutorReviewsById
+
 }

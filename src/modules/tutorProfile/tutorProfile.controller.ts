@@ -128,10 +128,88 @@ const updateTutorProfile = async (req: Request, res: Response) => {
     }
 };
 
+const getSingleTutorUserById = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const loggedInUser = req.user; // আপনার অ্যাথ মিডলওয়্যার থেকে আসা ডাটা
+
+        // ১. চেক করুন ইউজার লগইন করা আছে কি না
+        if (!loggedInUser) {
+            return res.status(401).json({ error: "Unauthorized access" });
+        }
+
+        if (!id) {
+            return res.status(400).json({ error: "User ID is required" });
+        }
+
+        // এখন টাইপস্ক্রিপ্ট আর এরর দিবে না
+        if (loggedInUser.role !== 'ADMIN' && loggedInUser.id !== id) {
+            return res.status(403).json({
+                error: "Forbidden",
+                message: "You can only view your own profile."
+            });
+        }
+
+        const result = await tutorProfileService.getSingleTutorUserById(id as string);
+        res.status(200).json(result);
+    } catch (e: any) {
+        res.status(400).json({
+            error: "Fetch failed",
+            details: e.message
+        });
+    }
+};
+
+
+const updateTutorUserProfileInDBbyId = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params; // যে আইডিটি আপডেট করতে চাওয়া হচ্ছে
+        const updateData = req.body;
+        const loggedInUser = req.user; // মিডলওয়্যার থেকে আসা লগইন করা ইউজার
+
+        // ১. ইউজার অথেনটিকেটেড কিনা চেক করুন
+        if (!loggedInUser) {
+            return res.status(401).json({
+                success: false,
+                message: "Unauthorized: Please login first"
+            });
+        }
+
+        if (!id) {
+            throw new Error("User ID is required");
+        }
+
+        // ২. সিকিউরিটি চেক: যদি এডমিন না হয় এবং রিকোয়েস্ট করা আইডিটি নিজের না হয়
+        if (loggedInUser.role !== 'ADMIN' && loggedInUser.id !== id) {
+            return res.status(403).json({
+                success: false,
+                message: "Forbidden: You can only update your own profile"
+            });
+        }
+
+        // ৩. ডাটাবেজ আপডেট কল
+        const result = await tutorProfileService.updateTutorUserProfileInDBbyId(id as string, updateData);
+
+        res.status(200).json({
+            success: true,
+            message: "User profile updated successfully",
+            data: result,
+        });
+
+    } catch (error: any) {
+        res.status(400).json({
+            success: false,
+            message: error.message || "An error occurred while updating profile",
+        });
+    }
+}
+
 export const tutorProfileController = {
     createTutorProfile,
     getAllTutorProfile,
     getSingleTutorProfileById,
     getAllTutorUser,
-    updateTutorProfile
+    updateTutorProfile,
+    getSingleTutorUserById,
+    updateTutorUserProfileInDBbyId
 }

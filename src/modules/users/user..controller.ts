@@ -10,25 +10,25 @@ const getAllUser = async (req: Request, res: Response) => {
         // 1. Extract and validate search string
         const { search, status } = req.query;
         const searchString = typeof search === "string" ? search : undefined;
-        
+
         // 2. Validate and cast status to UserStatus enum
         // If status is not a valid UserStatus, we pass undefined
-        const userStatus = Object.values(UserStatus).includes(status as UserStatus) 
-            ? (status as UserStatus) 
+        const userStatus = Object.values(UserStatus).includes(status as UserStatus)
+            ? (status as UserStatus)
             : undefined;
 
         // 3. Get pagination and sorting helpers
         const { page, limit, skip, sortBy, sortOrder } = paginationSortingHelper(req.query);
 
         // 4. Call service (Now includes the required 'status' property)
-        const result = await userService.getAlluser({ 
-            search: searchString, 
+        const result = await userService.getAlluser({
+            search: searchString,
             status: userStatus, // This solves the missing property error
-            page, 
-            limit, 
-            skip, 
-            sortBy, 
-            sortOrder 
+            page,
+            limit,
+            skip,
+            sortBy,
+            sortOrder
         });
 
         res.status(200).json({
@@ -57,7 +57,7 @@ const updateUser = async (req: Request, res: Response) => {
         const isAdmin = user.role === UserRole.ADMIN
         const result = await userService.updateUser(id as string, req.body, isAdmin);
         res.status(200).json({
-            success:true,
+            success: true,
             message: "User updated successfully",
             data: result
         })
@@ -100,8 +100,54 @@ const deleteUser = async (req: Request, res: Response) => {
     }
 }
 
+const getSingleStudentById = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        if (!id) {
+            throw new Error("User ID is required")
+        }
+
+        const result = await userService.getSingleStudentById(id as string);
+        res.status(200).json(result)
+    } catch (e) {
+        res.status(400).json({
+            error: "Category fetched failed",
+            details: e
+        })
+    }
+};
+
+const updateUserInDBbyId = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const updateData = req.body;
+        console.log("from update student profile", id)
+        if (!id) {
+            throw new Error("User ID is required")
+        }
+        console.log("userId", id)
+        // সার্ভিস কল করে ডাটাবেজ আপডেট করা
+        const result = await userService.updateUserInDBbyId(id as string, updateData);
+
+        // সফল রেসপন্স পাঠানো
+        res.status(200).json({
+            success: true,
+            message: "User profile updated successfully",
+            data: result,
+        });
+    } catch (error: any) {
+        // এরর রেসপন্স পাঠানো
+        res.status(400).json({
+            success: false,
+            message: error.message || "An error occurred while updating profile",
+        });
+    }
+}
+
 export const userController = {
     getAllUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    getSingleStudentById,
+    updateUserInDBbyId
 };

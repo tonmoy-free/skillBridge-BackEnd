@@ -15,6 +15,12 @@ router.get(
     tutorProfileController.getSingleTutorProfileById
 );
 
+router.get(
+    "/user/:id",
+    auth(UserRole.ADMIN,UserRole.TUTOR),
+    tutorProfileController.getSingleTutorUserById
+);
+
 
 router.post(
     "/",
@@ -31,6 +37,12 @@ router.patch(
     "/:id",
     auth(UserRole.TUTOR, UserRole.ADMIN),
     tutorProfileController.updateTutorProfile
+);
+
+router.patch(
+    "/user/:id",
+    auth(UserRole.TUTOR, UserRole.ADMIN),
+    tutorProfileController.updateTutorUserProfileInDBbyId
 );
 
 

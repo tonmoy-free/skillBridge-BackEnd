@@ -106,10 +106,10 @@ const getMyBookingsFromDB = async (req: Request, res: Response) => {
 
 const cancelBookingFromDB = async (req: Request, res: Response) => {
     try {
-        const { id } = req.params; 
+        const { id } = req.params;
         const userId = req.user?.id;
         const role = req.user?.role;
-console.log("concel",id)
+        console.log("concel", id)
         // ১. ID চেক (টাইপস্ক্রিপ্ট এখন নিশ্চিত হবে যে id একটি string)
         if (!id || typeof id !== 'string') {
             return res.status(400).json({
@@ -129,8 +129,8 @@ console.log("concel",id)
 
         // ৩. সার্ভিস কল (টাইপ কাস্টিং ব্যবহার করে এরর দূর করা হয়েছে)
         const result = await bookingService.cancelBookingFromDB(
-            id, 
-            userId as string, 
+            id,
+            userId as string,
             role as string
         );
 
@@ -147,6 +147,36 @@ console.log("concel",id)
     }
 };
 
+const getTutorSessionsByID = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params; // এটি হলো Tutor Profile ID
+        const user = (req as any).user; // এটি হলো লগইন করা User ID
+
+        // ১. যদি ইউজার এডমিন না হয়, তবে মালিকানা চেক করতে হবে
+        if (user.role !== "ADMIN" && user.id !== id) {
+            res.status(403).json({
+                success: false,
+                message: "Forbidden: You can only access your own sessions",
+            });
+            return;
+        }
+        const tutorid = await bookingService.isTutorOwner(id as string, user.id);
+
+        const result = await bookingService.getTutorSessionsbyIdFromDB(tutorid as string);
+
+        res.status(200).json({
+            success: true,
+            message: "Tutor sessions retrieved successfully",
+            data: result,
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || "Internal server error",
+        });
+    }
+}
+
 
 
 export const BookingController = {
@@ -154,5 +184,6 @@ export const BookingController = {
     getAllBooking,
     createBookingIntoDB,
     getMyBookingsFromDB,
-    cancelBookingFromDB
+    cancelBookingFromDB,
+    getTutorSessionsByID
 }

@@ -56,7 +56,69 @@ const createReviewIntoDB = async (payload: {
     return result;
 };
 
+const tutorId = async (tutorProfileId: string, loggedInUserId: string) => {
+    const tutor = await prisma.tutorProfile.findUnique({
+        where: {
+            userId: tutorProfileId,
+        },
+        select: {
+            id: true, // টিউটর প্রোফাইল টেবিল থেকে userId নিচ্ছি
+        }
+    });
+
+    // console.log("tutorProfileId",tutorProfileId)
+    // console.log("tutor.id",tutor?.id)
+    // console.log("loggedInUserId",loggedInUserId)
+    // যদি টিউটর প্রোফাইল পাওয়া যায় এবং তার userId লগইন করা ইউজারের সাথে মিলে যায়
+    return tutor?.id;
+};
+
+const getTutorReviewsFromDB = async (tutorProfileId: string) => {
+    // ১. ডাটাবেস থেকে সকল রিভিউ ফেচ করা
+    const reviews = await prisma.review.findMany({
+        where: {
+            tutorId: tutorProfileId
+        },
+        include: {
+            student: {
+                select: {
+                    name: true,
+                    image: true
+                }
+            }
+        },
+        orderBy: {
+            createdAt: 'desc'
+        }
+    });
+
+    // ২. এভারেজ রেটিং ক্যালকুলেট করা
+    const totalReviews = reviews.length;
+    
+    // যদি কোনো রিভিউ না থাকে তবে ডিফল্ট ০ রিটার্ন করবে
+    const averageRating = totalReviews > 0 
+        ? reviews.reduce((sum, rev) => sum + rev.rating, 0) / totalReviews 
+        : 0;
+
+    // ৩. আপনার দেওয়া ফরম্যাটে ডাটা রিটার্ন করা
+    return {
+        rating: Number(averageRating.toFixed(1)), // দশমিকের পর ১ ঘর পর্যন্ত রাখা
+        reviews: reviews.map(rev => ({
+            id: rev.id,
+            rating: rev.rating,
+            comment: rev.comment,
+            createdAt: rev.createdAt,
+            student: {
+                name: rev.student.name,
+                image: rev.student.image
+            }
+        }))
+    };
+}
+
 export const reviewService = {
     createReview,
-    createReviewIntoDB
+    createReviewIntoDB,
+    getTutorReviewsFromDB,
+    tutorId
 }

@@ -17,6 +17,12 @@ router.get(
     BookingController.getMyBookingsFromDB,
 );
 
+router.get(
+    "/:id",
+    auth(UserRole.ADMIN, UserRole.TUTOR),
+    BookingController.getTutorSessionsByID,
+);
+
 // router.post(
 //     "/",
 //     auth(UserRole.ADMIN, UserRole.STUDENT),
