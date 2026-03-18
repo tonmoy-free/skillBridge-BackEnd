@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.get(
     "/",
-    auth(UserRole.ADMIN, UserRole.STUDENT, UserRole.TUTOR),
+    auth(UserRole.ADMIN,UserRole.TUTOR,UserRole.STUDENT),
     BookingController.getMyBookingsFromDB,
 );
 
@@ -34,10 +34,17 @@ router.post(
     auth(UserRole.ADMIN, UserRole.STUDENT),
     BookingController.createBookingIntoDB,
 );
+
 router.patch(
     "/:id",
     auth(UserRole.ADMIN, UserRole.STUDENT),
     BookingController.cancelBookingFromDB
+);
+
+router.patch(
+    "/complete/:id",
+    auth(UserRole.ADMIN, UserRole.STUDENT,UserRole.TUTOR),
+    BookingController.updateBookingFromDB
 );
 
 

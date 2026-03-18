@@ -223,6 +223,36 @@ const cancelBookingFromDB = async (bookingId: string, userId: string, role: stri
     return result;
 };
 
+const updateBookingFromDB = async (bookingId: string, userId: string, role: string) => {
+    // ১. চেক করা যে বুকিংটি আসলেই এই ইউজারের কি না
+    const booking = await prisma.booking.findUnique({
+        where: { id: bookingId },
+        include: { tutor: true }
+    });
+
+    if (!booking) {
+        throw new Error("Booking not found!");
+    }
+
+    // ২. সিকিউরিটি চেক: শুধু সংশ্লিষ্ট স্টুডেন্ট বা টিউটরই ক্যান্সেল করতে পারবে
+    const isStudent = booking.studentId === userId;
+    const isTutor = booking.tutor.userId === userId;
+
+    if (!isStudent && !isTutor) {
+        throw new Error("You are not authorized to cancel this booking!");
+    }
+
+    // ৩. স্ট্যাটাস আপডেট করা
+    const result = await prisma.booking.update({
+        where: { id: bookingId },
+        data: {
+            status: BookingStatus.COMPLETED,
+        },
+    });
+
+    return result;
+};
+
 const autoUpdateBookingStatus = async () => {
     const currentTime = new Date();
 
@@ -291,6 +321,7 @@ export const bookingService = {
     cancelBookingFromDB,
     autoUpdateBookingStatus,
     getTutorSessionsbyIdFromDB,
-    isTutorOwner
+    isTutorOwner,
+    updateBookingFromDB
      
 }

@@ -147,6 +147,49 @@ const cancelBookingFromDB = async (req: Request, res: Response) => {
     }
 };
 
+const updateBookingFromDB = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user?.id;
+        const role = req.user?.role;
+        console.log("concel", id)
+        // ১. ID চেক (টাইপস্ক্রিপ্ট এখন নিশ্চিত হবে যে id একটি string)
+        if (!id || typeof id !== 'string') {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Booking ID",
+            });
+        }
+
+        // ২. User এবং Role চেক 
+        // এখানে চেক করার পর আমরা 'as string' ব্যবহার করে টাইপস্ক্রিপ্টকে নিশ্চিত করব
+        if (!userId || !role) {
+            return res.status(401).json({
+                success: false,
+                message: "Unauthorized! Please login again.",
+            });
+        }
+
+        // ৩. সার্ভিস কল (টাইপ কাস্টিং ব্যবহার করে এরর দূর করা হয়েছে)
+        const result = await bookingService.updateBookingFromDB(
+            id,
+            userId as string,
+            role as string
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Booking cancelled successfully",
+            data: result,
+        });
+    } catch (error: any) {
+        return res.status(400).json({
+            success: false,
+            message: error.message || "Failed to cancel booking",
+        });
+    }
+};
+
 const getTutorSessionsByID = async (req: Request, res: Response) => {
     try {
         const { id } = req.params; // এটি হলো Tutor Profile ID
@@ -185,5 +228,6 @@ export const BookingController = {
     createBookingIntoDB,
     getMyBookingsFromDB,
     cancelBookingFromDB,
-    getTutorSessionsByID
+    getTutorSessionsByID,
+    updateBookingFromDB
 }

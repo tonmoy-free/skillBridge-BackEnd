@@ -15,33 +15,53 @@ const createTutorProfile = async (data: Omit<TutorProfile, "id" | "rating" | "cr
 
 
 
+// const getAllTutorProfile = async (payload: { search?: string | undefined }) => {
+//     const result = await prisma.tutorProfile.findMany({
+//         where: {
+//             bio: {
+//                 contains: payload.search as string,
+//                 mode: "insensitive"
+//             },
+//         },
+//         include: {
+//             user: {
+//                 select: {
+//                     id: true,
+//                     name: true,
+//                     email: true,
+//                     image: true,
+//                 },
+//             },
+//             categories: true,
+//             availability: true,
+//             bookings: true,
+//             reviews: true
+//         },
+//     });
+//     return result;
+// };
+
 const getAllTutorProfile = async (payload: { search?: string | undefined }) => {
     const result = await prisma.tutorProfile.findMany({
-        where: {
-            bio: {
-                contains: payload.search as string,
-                mode: "insensitive"
-            },
-        },
+        where: payload.search ? {
+            OR: [
+                { bio: { contains: payload.search, mode: "insensitive" } },
+                { user: { name: { contains: payload.search, mode: "insensitive" } } }
+            ]
+        } : {}, // সার্চ না থাকলে খালি অবজেক্ট (সব ডাটা আসবে)
         include: {
             user: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    image: true,
-                },
+                select: { id: true, name: true, email: true, image: true },
             },
             categories: true,
-            availability: true,
-            bookings: true,
             reviews: true
         },
+        orderBy: {
+            rating: 'desc' // সেরা রেটিংয়ের টিউটররা আগে আসবে
+        }
     });
     return result;
 };
-
-
 const getSingleTutorProfileById = async (id: string) => {
     const result = await prisma.tutorProfile.findUnique({
         where: { userId: id },
@@ -144,32 +164,32 @@ const getSingleTutorUserById = async (id: string) => {
 
 
 const updateTutorUserProfileInDBbyId = async (
-  userId: string,
-  updateData: { name?: string; image?: string; phone?: string }
+    userId: string,
+    updateData: { name?: string; image?: string; phone?: string }
 ) => {
-  try {
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: { ...updateData },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        image: true,
-        phone: true,
-        role: true,
-        status: true,
-      },
-    });
+    try {
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: { ...updateData },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+                phone: true,
+                role: true,
+                status: true,
+            },
+        });
 
-    return updatedUser;
-  } catch (error: any) {
-    // Prisma error code for record not found
-    if (error.code === "P2025") {
-      throw new Error("User not found.");
+        return updatedUser;
+    } catch (error: any) {
+        // Prisma error code for record not found
+        if (error.code === "P2025") {
+            throw new Error("User not found.");
+        }
+        throw new Error(error.message || "Failed to update user profile.");
     }
-    throw new Error(error.message || "Failed to update user profile.");
-  }
 }
 
 
