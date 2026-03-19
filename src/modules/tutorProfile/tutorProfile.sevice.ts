@@ -15,53 +15,106 @@ const createTutorProfile = async (data: Omit<TutorProfile, "id" | "rating" | "cr
 
 
 
-// const getAllTutorProfile = async (payload: { search?: string | undefined }) => {
+// const getAllTutorProfile = async (payload: {
+//     search?: string | undefined, // এখানে undefined যোগ করুন
+//     categoryId?: string | undefined,
+//     maxPrice?: number | undefined,
+//     minRating?: number | undefined
+// }) => {
+//     const { search, categoryId, maxPrice, minRating } = payload;
+
 //     const result = await prisma.tutorProfile.findMany({
 //         where: {
-//             bio: {
-//                 contains: payload.search as string,
-//                 mode: "insensitive"
-//             },
+//             AND: [
+//                 // সার্চ ফিল্টার (নাম বা বায়ো)
+//                 search ? {
+//                     OR: [
+//                         { bio: { contains: search, mode: "insensitive" } },
+//                         { user: { name: { contains: search, mode: "insensitive" } } }
+//                     ]
+//                 } : {},
+//                 // ক্যাটাগরি ফিল্টার
+//                 categoryId ? {
+//                     categories: { some: { id: categoryId } }
+//                 } : {},
+//                 // প্রাইস ফিল্টার
+//                 maxPrice ? {
+//                     hourlyFee: { lte: Number(maxPrice) }
+//                 } : {},
+//                 // রেটিং ফিল্টার
+//                 minRating ? {
+//                     rating: { gte: Number(minRating) }
+//                 } : {},
+//             ]
 //         },
 //         include: {
-//             user: {
-//                 select: {
-//                     id: true,
-//                     name: true,
-//                     email: true,
-//                     image: true,
-//                 },
-//             },
+//             user: { select: { id: true, name: true, email: true, image: true } },
 //             categories: true,
-//             availability: true,
-//             bookings: true,
 //             reviews: true
 //         },
+//         orderBy: { rating: 'desc' }
 //     });
 //     return result;
 // };
 
-const getAllTutorProfile = async (payload: { search?: string | undefined }) => {
+
+const getAllTutorProfile = async (payload: {
+    search?: string | undefined, // এখানে undefined যোগ করুন
+    categoryId?: string | undefined,
+    maxPrice?: number | undefined,
+    minRating?: number | undefined
+}) => {
+    const { search, categoryId, maxPrice, minRating } = payload;
+
+    // ১. একটি খালি অবজেক্ট দিয়ে শুরু করুন
+    const where: any = {};
+
+    // ২. ক্যাটাগরি ফিল্টার (এটিই আপনার মেইন সমস্যা সমাধান করবে)
+    if (categoryId && categoryId !== 'undefined') {
+        where.categories = {
+            some: {
+                id: categoryId
+            }
+        };
+    }
+
+    // ৩. সার্চ ফিল্টার
+    if (search && search !== 'undefined') {
+        where.OR = [
+            { bio: { contains: search, mode: "insensitive" } },
+            { user: { name: { contains: search, mode: "insensitive" } } }
+        ];
+    }
+
+    // ৪. প্রাইস এবং রেটিং ফিল্টার (AND ব্যবহার করে)
+    const andConditions = [];
+
+    if (maxPrice && !isNaN(Number(maxPrice))) {
+        andConditions.push({ hourlyFee: { lte: Number(maxPrice) } });
+    }
+
+    if (minRating && !isNaN(Number(minRating))) {
+        andConditions.push({ rating: { gte: Number(minRating) } });
+    }
+
+    if (andConditions.length > 0) {
+        where.AND = andConditions;
+    }
+
+    // ৫. ফাইনাল কোয়েরি
     const result = await prisma.tutorProfile.findMany({
-        where: payload.search ? {
-            OR: [
-                { bio: { contains: payload.search, mode: "insensitive" } },
-                { user: { name: { contains: payload.search, mode: "insensitive" } } }
-            ]
-        } : {}, // সার্চ না থাকলে খালি অবজেক্ট (সব ডাটা আসবে)
+        where: where, // এখানে তৈরি করা dynamic object-টি পাস করুন
         include: {
-            user: {
-                select: { id: true, name: true, email: true, image: true },
-            },
+            user: { select: { id: true, name: true, email: true, image: true } },
             categories: true,
             reviews: true
         },
-        orderBy: {
-            rating: 'desc' // সেরা রেটিংয়ের টিউটররা আগে আসবে
-        }
+        orderBy: { rating: 'desc' }
     });
+
     return result;
 };
+
 const getSingleTutorProfileById = async (id: string) => {
     const result = await prisma.tutorProfile.findUnique({
         where: { userId: id },
