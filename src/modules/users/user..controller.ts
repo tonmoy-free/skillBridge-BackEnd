@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { userService } from "./user.service";
 import paginationSortingHelper from "../../helpers/paginationSortingHelper";
-import { UserStatus } from "../../../generated/prisma/enums";
+// import { UserStatus } from "../../../generated/prisma/enums";
 import { UserRole } from "../../middleware/auth";
-import { classService } from "../class/class.service";
+import { UserStatus } from "../../generated/enums";
 
 const getAllUser = async (req: Request, res: Response) => {
     try {
@@ -144,10 +144,31 @@ const updateUserInDBbyId = async (req: Request, res: Response) => {
     }
 }
 
+const getAdminAnalytics = async (req: Request, res: Response) => {
+    try {
+        const result = await userService.getAdminAnalyticsFromDB();
+
+        res.status(200).json({
+            success: true,
+            message: "Analytics fetched successfully",
+            data: result
+        });
+    } catch (e) {
+        res.status(400).json({
+            success: false,
+            message: "Failed to fetch analytics",
+            details: e instanceof Error ? e.message : e
+        });
+    }
+};
+
+
+
 export const userController = {
     getAllUser,
     updateUser,
     deleteUser,
     getSingleStudentById,
-    updateUserInDBbyId
+    updateUserInDBbyId,
+    getAdminAnalytics
 };

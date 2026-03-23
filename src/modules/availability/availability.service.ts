@@ -1,4 +1,5 @@
-import { Availability, TutorProfile } from "../../../generated/prisma/client";
+// import { Availability, TutorProfile } from "../../../generated/prisma/client";
+import { Availability } from "../../generated/client";
 import { prisma } from "../../lib/prisma";
 
 

@@ -13,6 +13,12 @@ router.get(
 );
 
 router.get(
+    "/analytics",
+    // auth(UserRole.ADMIN),
+    userController.getAdminAnalytics
+);
+
+router.get(
     "/:id",
     auth(UserRole.ADMIN,UserRole.STUDENT),
     userController.getSingleStudentById

@@ -1,4 +1,5 @@
-import { Booking, BookingStatus } from "../../../generated/prisma/client";
+// import { Booking, BookingStatus } from "../../../generated/prisma/client";
+import { Booking, BookingStatus } from "../../generated/client";
 import { prisma } from "../../lib/prisma";
 
 

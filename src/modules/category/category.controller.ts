@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import { categoryService } from "./category.service";
-import { subjectService } from "../subject/subject.service";
 import { UserRole } from "../../middleware/auth";
 
 

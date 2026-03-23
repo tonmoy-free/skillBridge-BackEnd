@@ -1,6 +1,7 @@
 import { get } from "node:http";
-import { TutorProfile } from "../../../generated/prisma/client";
+// import { TutorProfile } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
+import { TutorProfile } from "../../generated/client";
 
 
 //Partial => typescript ke bole dewa kicu data thakbe kishu deta thakbe na

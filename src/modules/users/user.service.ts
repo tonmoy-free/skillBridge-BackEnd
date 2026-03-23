@@ -1,5 +1,7 @@
-import { User } from "../../../generated/prisma/client";
-import { UserStatus } from "../../../generated/prisma/enums";
+// import { User } from "../../../generated/prisma/client";
+// import { UserStatus } from "../../../generated/prisma/enums";
+import { User } from "../../generated/client";
+import { UserStatus } from "../../generated/enums";
 import { prisma } from "../../lib/prisma";
 
 const getAlluser = async ({
@@ -155,6 +157,54 @@ const updateUserInDBbyId = async (
   }
 }
 
+const getAdminAnalyticsFromDB = async () => {
+  const [
+    totalUser,
+    totalTutor,
+    totalCategory,
+    totalReview,
+    bookings,
+    totalBanUser
+  ] = await Promise.all([
+    prisma.user.count(),
+    prisma.tutorProfile.count(),
+    prisma.category.count(),
+    prisma.review.count(),
+    prisma.booking.findMany({
+      select: { 
+        status: true, 
+        duration: true, 
+        tutor: { select: { hourlyFee: true } } 
+      }
+    }),
+    prisma.user.count({ where: { status: UserStatus.BANNED } }),
+  ]);
+
+  const totalBooking = bookings.length;
+  const completed = bookings.filter(b => b.status === "COMPLETED").length;
+  const cancelled = bookings.filter(b => b.status === "CANCELLED").length;
+  const active = bookings.filter(b => b.status === "BOOKED").length;
+
+  const totalRevenue = bookings
+    .filter(b => b.status === "COMPLETED")
+    .reduce((acc, curr) => acc + (curr.duration / 60) * (curr.tutor?.hourlyFee || 0), 0);
+
+  return {
+    totalUser,
+    totalTutor,
+    totalStudent: totalUser - totalTutor,
+    totalBooking,
+    completed,
+    cancelled,
+    active,
+    totalReview,
+    totalCategory,
+    totalBanUser,
+    totalRevenue: Math.round(totalRevenue)
+  };
+};
+
+
 
 
 export const userService = {
@@ -162,5 +212,6 @@ export const userService = {
   updateUser,
   deleteuser,
   getSingleStudentById,
-  updateUserInDBbyId
+  updateUserInDBbyId,
+  getAdminAnalyticsFromDB
 };

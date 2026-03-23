@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { bookingService } from "./booking.service";
 import paginationSortingHelper from "../../helpers/paginationSortingHelper";
-import { BookingStatus } from "../../../generated/prisma/enums";
+import { BookingStatus } from "../../generated/enums";
+// import { BookingStatus } from "../../../generated/prisma/enums";
 
 
 const createBooking = async (req: Request, res: Response) => {

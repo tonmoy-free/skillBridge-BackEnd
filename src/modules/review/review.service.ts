@@ -1,4 +1,5 @@
-import { Review } from "../../../generated/prisma/client";
+// import { Review } from "../../../generated/prisma/client";
+import { Review } from "../../generated/client";
 import { prisma } from "../../lib/prisma";
 
 
