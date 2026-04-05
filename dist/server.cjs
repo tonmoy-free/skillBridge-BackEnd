@@ -1,7 +1,7 @@
 
-      import { createRequire } from 'module';
-      const require = createRequire(import.meta.url);
-    
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
 "use strict";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
@@ -770,7 +770,11 @@ var auth = (0, import_better_auth.betterAuth)({
     // or "mysql", "postgresql", ...etc
   }),
   baseURL: process.env.APP_URL,
-  trustedOrigins: [process.env.APP_URL],
+  trustedOrigins: [
+    process.env.APP_URL,
+    "https://skill-bridge-frontend-pearl.vercel.app", // আপনার ফ্রন্টএন্ড লিঙ্ক
+    "http://localhost:3000"
+  ],
   user: {
     additionalFields: {
       role: {

@@ -22,13 +22,25 @@ async function seedAdmin() {
         }
 
         //  create admin via auth API
+        // const res = await fetch(
+        //     "http://localhost:3000/api/auth/sign-up/email",
+        //     {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //             "Origin": "http://localhost:3000"
+        //         },
+        //         body: JSON.stringify(adminData),
+        //     }
+        // );
+
         const res = await fetch(
-            "http://localhost:3000/api/auth/sign-up/email",
+            `${process.env.APP_URL}/api/auth/sign-up/email`, // সরাসরি .env থেকে আসবে
             {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Origin": "http://localhost:3000"
+                    "Origin": process.env.APP_URL || "http://localhost:3000" // অরিজিন-ও .env থেকে
                 },
                 body: JSON.stringify(adminData),
             }

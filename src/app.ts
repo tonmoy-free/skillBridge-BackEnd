@@ -10,20 +10,32 @@ import { reviewRouter } from "./modules/review/review.router";
 import errorHandler from "./middleware/globalErrorHandler";
 import { userRouter } from "./modules/users/user.router";
 import { UserRole } from "./middleware/auth";
+import cookieParser from "cookie-parser";
+import path from "path";
+import qs from "qs";
 // import cron from "node-cron";
 import { bookingService } from "./modules/booking/booking.service";
 
 
 
 const app: Application = express();
+app.set("query parser", (str: string) => qs.parse(str));
 
-// app.use(cookieParser());
+app.set("view engine", "ejs");
+app.set("views", path.resolve(process.cwd(), `src/app/templates`));
+
+app.use(cookieParser());
 app.use(cors({
-    origin: process.env.APP_URL || "http://localhost:4000",
     credentials: true,
+    origin: process.env.APP_URL || "https://skill-bridge-frontend-pearl.vercel.app",
+    // origin: "http://localhost:3000",
     // methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     // allowedHeaders: [["Content-Type", "Authorization", "Cookie"],
 }))
+
+// Better-auth handler-এর আগে express.json() থাকা নিরাপদ
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
@@ -31,25 +43,25 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/dashboard/booking", bookingRouter);
+app.use("/api/v1/dashboard/booking", bookingRouter);
 
 app.use("/dashboard/user",
 
     userRouter);
 
-app.use("/tutors/tutors-profile", tutorProfileRouter);
+app.use("/api/v1/tutors/tutors-profile", tutorProfileRouter);
 
 
 
-app.use("/tutors/category", categoryRouter);
+app.use("/api/v1/tutors/category", categoryRouter);
 
-app.use("/category", categoryRouter);
+app.use("/api/v1/category", categoryRouter);
 
 
 
-app.use("/tutor/availability", availabilityRouter);
+app.use("/api/v1/tutor/availability", availabilityRouter);
 
-app.use("/tutors/review", reviewRouter);
+app.use("/api/v1/tutors/review", reviewRouter);
 
 app.use(errorHandler)
 
